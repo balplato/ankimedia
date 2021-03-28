@@ -17,30 +17,13 @@ HEADERS = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,imag
            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0'}
 
 html = get(URL).text
-
 soup = BeautifulSoup(html, 'html.parser')
+items = soup.find_all('source')
+tracks = 0
 
-item = soup.find_all('source')
-
-mp3 = set()
-american = ''
-british = ''
-
-for i in item:
-    if '.ogg' in str(i):
-        pass
-    else:
-        mp3.add((i['src']))
-
-for m in mp3:
-    if 'us_pron' in m:
-        american += m
-        print(f"American: {american}")
-    else:
-        british += m
-        print(f'British: {british}')
-
-link = f'{SITE}{american}'
-
-with open(f'{LOCAL_PATH}{WORD}_us.mp3', 'wb') as f:
-    f.write(get(link).content)
+for item in items:
+    if '.mp3' in str(item) and 'us_pron' in str(item) and tracks < 1:
+        link = f'{SITE}{item["src"]}'
+        with open(f'{LOCAL_PATH}{WORD}.mp3', 'wb') as f:
+            f.write(get(link).content)
+        tracks += 1
